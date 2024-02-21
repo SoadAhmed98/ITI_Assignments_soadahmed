@@ -1,0 +1,105 @@
+/************************************1********************************
+vi /etc/httpd/conf.modules.d/00-mpm.conf
+
+
+LoadModule mpm_worker_module modules/mod_mpm_worker.so ------------> uncomment this line
+
+
+#LoadModule mpm_event_module modules/mod_mpm_event.so --------------> comment this line
+
+
+esc
+:wq
+systemctl restart httpd
+
+/********************************************2**************************************/
+httpd -M | grep rewrite
+
+ rewrite_module (shared)
+ /*******************************************3**************************************/
+
+-----------------------------------------step1----------------------------------
+
+vi /etc/httpd/conf/httpd.conf
+i
+ <Directory "/var/www/html">
+   
+    AllowOverride All --------------->change from None to All
+</Directory>
+esc
+:wq
+
+cd /var/www/html
+vi .htaccess
+i
+      RewriteEngine On
+ -------------------------------------------a-----------------------------------
+
+        
+         RewriteCond "%{QUERY_STRING}" "forbidden" [NC]
+         RewriteRule "^page$" "-" [F]
+
+ 
+ esc
+ :wq
+
+
+systemctl restart httpd
+-------------------------------------------b-----------------------------------
+comment previous code
+
+        RewriteCond %{QUERY_STRING} "."
+        RewriteRule "^(.*)$" "/$1?" [R]
+
+ esc
+ :wq
+
+
+systemctl restart httpd
+-------------------------------------------c-----------------------------------
+comment previous code
+
+         RewriteCond "%{QUERY_STRING}" "(val)" 
+         RewriteRule "^page1$" "/page2?var=%1" [R]
+ 
+ esc
+ :wq
+
+systemctl restart httpd
+-------------------------------------------d-----------------------------------
+comment previous code
+
+         RewriteCond "%{QUERY_STRING}" "var=val" 
+         RewriteRule "^path$" "/path/var/val?" [R]
+
+ esc
+ :wq
+
+systemctl restart httpd
+-------------------------------------------e-----------------------------------
+comment previous code
+
+       RewriteRule "^example/(.+)/(.+)" "/something.cgi?arg=$1&other=$2" [R]
+
+ esc
+ :wq
+
+systemctl restart httpd
+    
+/********************************************4************************************/
+<VirtualHost *:80>
+    ServerName os.iti.gov.eg
+    DocumentRoot "/var/www/html/soad2"
+
+    <Directory "/var/www/html/soad2">
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    RewriteEngine On
+    RewriteRule ^/(.*)$ /dir2/$1 [R]
+</VirtualHost>
+
+
+systemctl restart httpd

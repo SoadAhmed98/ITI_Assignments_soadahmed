@@ -1,0 +1,187 @@
+/***********************************1**************************************/
+yum install httpd
+system start httpd
+/************************************2*************************************/
+
+------------------------------------------step1----------------------------------
+cd /var/www/html
+touch page1.html page2.html
+vi page1.html
+i
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+	    <meta charset="UTF-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	    <title>page1</title>
+	</head>
+	<body>
+	    <h1>hello from page 1</h1>
+	</body>
+	</html>
+esc 
+wq
+
+vi page2.html
+i
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+	    <meta charset="UTF-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	    <title>page2</title>
+	</head>
+	<body>
+	    <h1>hello from page 2</h1>
+	</body>
+	</html>
+esc 
+wq
+-------------------------------------step2-------------------------------------------
+su //to be root to make changes in global httpd configuration
+vi /etc/httpd/conf/httpd.conf
+i
+<VirtualHost *:80>
+        ServerName root@localhost
+        Redirect /page1.html /page2.html
+</VirtualHost>
+esc
+:wq
+systemctl restart httpd
+/****************************************3*****************************************/
+------------------------------------------step1----------------------------------
+cd /var/www/html
+mkdir soad
+cd soad 
+touch 2index.html
+vi 2index.html
+i
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+	    <meta charset="UTF-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	    <title>hello</title>
+	</head>
+	<body>
+	    <h1>hello from soad </h1>
+	</body>
+	</html>
+esc 
+wq
+------------------------------------------step2----------------------------------
+vi .htaccess
+i
+AuthType Basic
+
+    AuthName "Restricted web page"
+
+    AuthUserFile "/var/www/html/soad/.htpasswd"
+
+   require valid-user
+esc
+:wq
+htpasswd -c .htpasswd soad
+--------------------------------------step3--------------------------------------
+vi /etc/httpd/conf/httpd.conf
+i
+<Directory "/var/www">
+    AllowOverride All
+    # Allow open access:
+    Require all granted
+</Directory>
+
+<Directory "/var/www/html/soad">
+    AllowOverride All
+</Directory>
+
+esc
+:wq
+systemctl restart httpd
+/**************************************************4****************************************/
+vi /etc/httpd/conf/httpd.conf
+i
+<VirtualHost *:80>
+        ServerName root@localhost
+        Redirect /page1.html /page2.html
+       <FilesMatch "\.pdf$">
+         AuthName "Permission Required"
+         AuthUserFile "/var/www/html/soad/.htpasswd"
+         Require valid-user
+         AuthType Basic
+      </FilesMatch>
+</VirtualHost>
+
+esc
+:wq
+systemctl restart httpd
+/*****************************************************5******************************************/
+------------------------------------------step1----------------------------------
+cd /var/www/html
+mkdir soad
+cd soad 
+touch 2index.html
+vi 2index.html
+i
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+	    <meta charset="UTF-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	    <title>hello</title>
+	</head>
+	<body>
+	    <h1>hello from soad2 </h1>
+	</body>
+	</html>
+esc 
+wq
+------------------------------------------step2----------------------------------
+vi .htaccess
+i
+AuthType Basic
+
+    AuthName "Restricted web page"
+
+    AuthUserFile "/var/www/html/soad2/.htpasswd"
+
+   require user ahmed
+esc
+:wq
+htpasswd -c .htpasswd ahmed
+--------------------------------------step3--------------------------------------
+vi /etc/httpd/conf/httpd.conf
+i
+<Directory "/var/www">
+    AllowOverride All
+    # Allow open access:
+    Require all granted
+</Directory>
+
+<Directory "/var/www/html/soad2">
+    AllowOverride All
+</Directory>
+
+esc
+:wq
+systemctl restart httpd
+/************************************************6**************************************/
+vi /etc/httpd/conf/httpd.conf
+i
+<Directory /var/www/soad>
+    Options -Indexes FollowSymLinks
+</Directory>
+esc
+:wq
+systemctl restart httpd
+/************************************************7******************************************/
+cd /var/www/html/soad/
+cp 2index.html default.html
+vi /etc/httpd/conf/httpd.conf
+i
+<IfModule dir_module>
+    DirectoryIndex index.html default.html
+</IfModule>
+esc
+:wq
+systemctl restart httpd
