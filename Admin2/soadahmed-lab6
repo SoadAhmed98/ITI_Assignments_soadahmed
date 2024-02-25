@@ -1,0 +1,63 @@
+/*****************************************1**********************************/
+systemctl list-unit-files --type service
+/*****************************************2**********************************/
+systemctl set-default multi-user.target
+----------output---------
+Removed "/etc/systemd/system/default.target".
+Created symlink /etc/systemd/system/default.target → /usr/lib/systemd/system/multi-user.target.
+--------------------------
+reboot
+/-----------it will remove graphical user interface---------------/
+/*****************************************3**********************************/
+sendmail root
+from:soadahmed
+to:root
+hello root
+.
+/****************************************4*************************************/
+first way: cd /var/mail/    ------------>check if root file is exist and oper it using vi
+second way :check the maillog file vi /var/log/maillog 
+/****************************************5**************************************/
+systemctl stop postfix
+-----------output---------------
+Failed to stop postfix.service: Unit postfix.service not loaded.
+yum install postfix
+/*****************************************6&7************************************/
+systemctl stop postfix
+sendmail root
+from:soadahmed
+to:root
+hello again after stop postfix
+.
+
+-----------there is file in /var/mail called root.lock--------------------------
+/******************************************8********************************************/
+systemctl start postfix
+/******************************************9********************************************/
+when i start postfix sendmail become inactive and my mail changed from root.lock and added to root file
+/*****************************************10********************************************/
+sudo nano /etc/default/grub
+GRUB_TIMEOUT=20
+/******************************************11*******************************************/
+sudo nano /etc/default/grub
+GRUB_DEFAULT=                           -----------> change this value but i don't have any os except redhat9
+/******************************************12********************************************/
+crontab -e
+*/10 8-17 * * * /usr/bin/free -m >> any file to save the output
+/*******************************************13********************************************/
+vi messege
+i
+from:soadahmed
+to:root
+hello from cron
+.
+esc
+:mq
+crontab -e
+*/10 8-17 * * * sendmail  root > /home/soadahmed/ITI/'Admin 2 - linux'
+/******************************************14*************************************************/
+crontab -u username -e
+/******************************************15*************************************************/
+
+
+
